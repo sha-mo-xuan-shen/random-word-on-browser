@@ -6,7 +6,7 @@
 
 1. 下载以下两个文件：
    - `manifest.json`
-   - `content.js`
+   - `cet4.js`
 
 2. 打开浏览器的扩展管理页面：
    - Chrome/Edge浏览器输入地址：`edge://extensions/` 或 `chrome://extensions/`
@@ -27,7 +27,6 @@
 ⚠️ 请确保两个文件放在同一个独立的文件夹中  
 ⚠️ 需要浏览器支持Chrome扩展API  
 ⚠️ 首次安装后可能需要刷新页面生效
+⚠️ 不要一次点出来太多，会对浏览器造成负担
+⚠️ 你的屏幕可能会变成disco舞厅
 
-## 技术支持
-
-如有问题，请联系开发者邮箱：your-email@example.com
