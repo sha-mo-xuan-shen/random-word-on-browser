@@ -1,14 +1,7 @@
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-  ga('create', 'UA-79927007-1', 'auto');
-  ga('send', 'pageview');
-  
-  onload = function() {
-      var $html = document.getElementsByTagName("html")[0];
-      var $body = document.getElementsByTagName("body")[0];
-      var words = [
+onload = function() {
+    const $html = document.documentElement;
+    const $body = document.body;
+    var words = [
         'consistent', 'battery', 'competent', 'preserve', 'possession',
         'proximately', 'wildfire', 'compact', 'defy', 'absolutely',
         'filter', 'server', 'spoil', 'rustle', 'diversion',
@@ -2274,84 +2267,74 @@
           'n. 誓言， 誓约； 咒骂， 诅咒语', 'n. 回答， 答复； 反应， 响应', 'n. 条约， 协议， 协定', 'n. 庄严， 端庄； 尊严， 高贵', 'n. 挑战，邀请比赛；艰巨的任务；怀疑，质问 vt. 反对， 公然反抗； 向…挑战； 对…质疑',
           'adj. 竞争的，对抗的 n. 竞争对手，敌手；可与匹敌的人 vt. 与…竞争； 与…匹敌， 比得上'
           ];
-      
-      // 创建气泡的函数
-      function createBubble(e) {
-          var $elem = document.createElement("b");
-          
-          // 为每个气泡生成独立的随机索引
-          var randomIndex = Math.floor(Math.random() * words.length);
-          var currentWord = words[randomIndex];
-          var currentDefinition = definitions[randomIndex];
-          
-          // 样式设置
-          $elem.style.color = getRandomColor();
-          $elem.style.zIndex = 9999;
-          $elem.style.position = "absolute";
-          $elem.style.userSelect = "none";
-          $elem.style.fontWeight = "bold";
-          $elem.style.textShadow = "0 0 8px currentColor, 0 0 12px white";
-          $elem.style.padding = "2px 5px";
-          $elem.style.borderRadius = "3px";
-          $elem.style.backgroundColor = "rgba(0,0,0,0.2)";
-          $elem.style.cursor = "pointer";
-          
-          var x = e.pageX;
-          var y = e.pageY-50;
-          $elem.style.left = (x - 20) + "px";
-          $elem.style.top = (y - 30) + "px";
-          
-          $elem.innerText = currentWord;
-          $elem.dataset.definition = currentDefinition;
-          $elem.dataset.word = currentWord; // 存储单词以便鼠标移出时恢复
-          
-          $elem.style.fontSize = "22px";
-          var increase = 0;
-          var anim;
-          
-          // 鼠标悬停事件
-          $elem.onmouseover = function() {
-              clearInterval(anim);
-              this.innerText = this.dataset.definition;
-              this.style.backgroundColor = "rgba(0,0,0,0.5)";
-          };
-          
-          // 鼠标离开事件
-          $elem.onmouseout = function() {
-              this.innerText = this.dataset.word;
-              this.style.backgroundColor = "rgba(0,0,0,0.2)";
-              startAnimation();
-          };
-          
-          function startAnimation() {
-              anim = setInterval(function() {
-                  if (++increase == 800) {
-                      clearInterval(anim);
-                      $body.removeChild($elem);
-                  }
-                  $elem.style.top = y - 20 - increase + "px";
-                  $elem.style.opacity = (800 - increase) / 500;
-                  
-                  if(increase % 50 === 0) {
-                      $elem.style.color = getRandomColor();
-                  }
-              }, 20);
-          }
-          
-          setTimeout(startAnimation, 70);
-          $body.appendChild($elem);
-      }
-      
-      // 直接绑定点击事件，无防抖处理
-      $html.onclick = createBubble;
     
-      // 生成随机颜色的函数
-      function getRandomColor() {
-          var letters = '0123456789ABCDEF';
-          var color = '#';
-          for (var i = 0; i < 6; i++) {
-              color += letters[Math.floor(Math.random() * 16)];
-          }
-          return color;
-      }
-  };
+    function createBubble(e) {
+        const bubble = document.createElement("b");
+        const randomIndex = Math.floor(Math.random() * words.length);
+        const word = words[randomIndex];
+        const definition = definitions[randomIndex];
+        
+        // 初始位置
+        let posX = e.pageX - 20;
+        let posY = e.pageY - 50;
+        
+        Object.assign(bubble.style, {
+            color: getRandomColor(),
+            position: "absolute",
+            left: `${posX}px`,
+            top: `${posY}px`,
+            fontSize: "22px",
+            fontWeight: "bold",
+            padding: "2px 5px",
+            borderRadius: "3px",
+            backgroundColor: "rgba(0,0,0,0.2)",
+            cursor: "pointer",
+            zIndex: 9999,
+            userSelect: "none"
+        });
+        
+        bubble.textContent = word;
+        
+        // 动画状态
+        let anim = null;
+        let currentY = posY; // 保存当前Y位置
+        
+        function animate() {
+            currentY -= 1; // 每次上移1px
+            bubble.style.top = `${currentY}px`;
+            bubble.style.opacity = `${1 - (posY - currentY)/800}`;
+            
+            if(posY - currentY >= 800) {
+                clearInterval(anim);
+                bubble.remove();
+                return;
+            }
+            
+            if((posY - currentY) % 50 === 0) {
+                bubble.style.color = getRandomColor();
+            }
+        }
+        
+        bubble.addEventListener('mouseenter', () => {
+            clearInterval(anim);
+            bubble.textContent = definition;
+            bubble.style.backgroundColor = "rgba(0,0,0,0.5)";
+        });
+        
+        bubble.addEventListener('mouseleave', () => {
+            bubble.textContent = word;
+            bubble.style.backgroundColor = "rgba(0,0,0,0.2)";
+            anim = setInterval(animate, 20);
+        });
+        
+        // 开始动画
+        anim = setInterval(animate, 20);
+        $body.appendChild(bubble);
+    }
+    
+    $html.addEventListener('click', createBubble);
+    
+    function getRandomColor() {
+        return `hsl(${Math.random() * 360}, 70%, 60%)`;
+    }
+};
