@@ -1,6 +1,7 @@
 onload = function() {
     const $html = document.documentElement;
     const $body = document.body;
+    // 示例单词和定义数组
     var words = [
         'consistent', 'battery', 'competent', 'preserve', 'possession',
         'proximately', 'wildfire', 'compact', 'defy', 'absolutely',
@@ -2274,15 +2275,31 @@ onload = function() {
         const word = words[randomIndex];
         const definition = definitions[randomIndex];
         
-        // 初始位置
-        let posX = e.pageX - 20;
-        let posY = e.pageY - 50;
+        // 将页面坐标转换为百分比单位
+        // 先计算偏移量对应的 vw/vh（例如20px和50px）
+        const offsetX = 20 / window.innerWidth * 100; // 20px 对应的 vw
+        const offsetY = 50 / window.innerHeight * 100; // 50px 对应的 vh
         
+        // 初始位置转换为 vw/vh 单位
+        let posX = (e.pageX / window.innerWidth * 100) - offsetX;
+        let posY = (e.pageY / window.innerHeight * 100) - offsetY;
+        const initialPosY = posY;  // 用于计算移动距离
+        
+        // 动画参数：将原来基于像素的数值转换为 vh 的比例值
+        // 每帧上移 0.5px 转换为 vh：0.5 / window.innerHeight * 100
+        const speedVh = (0.3 / window.innerHeight) * 100;
+        // 800px 上移距离转换为 vh
+        const removeThreshold = (800 / window.innerHeight) * 100;
+        // 每 50px 更换一次颜色，转成 vh
+        const colorChangeThresholdIncrement = (50 / window.innerHeight) * 100;
+        let nextColorThreshold = colorChangeThresholdIncrement;
+        
+        // 设置气泡样式，使用 vw 和 vh 单位定位
         Object.assign(bubble.style, {
             color: getRandomColor(),
             position: "absolute",
-            left: `${posX}px`,
-            top: `${posY}px`,
+            left: `${posX}vw`,
+            top: `${posY}vh`,
             fontSize: "22px",
             fontWeight: "bold",
             padding: "2px 5px",
@@ -2290,45 +2307,54 @@ onload = function() {
             backgroundColor: "rgba(0,0,0,0.2)",
             cursor: "pointer",
             zIndex: 9999,
-            userSelect: "none"
+            userSelect: "none",
+            opacity: "1"
         });
-        
         bubble.textContent = word;
         
-        // 动画状态
-        let anim = null;
-        let currentY = posY; // 保存当前Y位置
+        let animationFrameId = null;
         
         function animate() {
-            currentY -= 1; // 每次上移1px
-            bubble.style.top = `${currentY}px`;
-            bubble.style.opacity = `${1 - (posY - currentY)/800}`;
+            posY -= speedVh; // 每帧上移 speedVh vh 单位
+            bubble.style.top = `${posY}vh`;
             
-            if(posY - currentY >= 800) {
-                clearInterval(anim);
+            // 当前移动的距离
+            const distanceMoved = initialPosY - posY;
+            // 根据移动距离调整透明度
+            bubble.style.opacity = `${Math.max(0, 1 - (distanceMoved / removeThreshold))}`;
+            
+            // 当移动距离超过下一个颜色更换的阈值时更换颜色
+            if (distanceMoved >= nextColorThreshold) {
+                bubble.style.color = getRandomColor();
+                nextColorThreshold += colorChangeThresholdIncrement;
+            }
+            
+            // 当移动距离达到移除阈值时，停止动画并移除气泡
+            if (distanceMoved >= removeThreshold) {
+                cancelAnimationFrame(animationFrameId);
                 bubble.remove();
                 return;
             }
             
-            if((posY - currentY) % 50 === 0) {
-                bubble.style.color = getRandomColor();
-            }
+            animationFrameId = requestAnimationFrame(animate);
         }
         
+        // 鼠标移入时暂停动画，并显示定义
         bubble.addEventListener('mouseenter', () => {
-            clearInterval(anim);
+            cancelAnimationFrame(animationFrameId);
             bubble.textContent = definition;
             bubble.style.backgroundColor = "rgba(0,0,0,0.5)";
         });
         
+        // 鼠标移出时恢复动画并显示单词
         bubble.addEventListener('mouseleave', () => {
             bubble.textContent = word;
             bubble.style.backgroundColor = "rgba(0,0,0,0.2)";
-            anim = setInterval(animate, 20);
+            animationFrameId = requestAnimationFrame(animate);
         });
         
-        // 开始动画
-        anim = setInterval(animate, 20);
+        // 启动动画
+        animationFrameId = requestAnimationFrame(animate);
         $body.appendChild(bubble);
     }
     
