@@ -5,7 +5,7 @@ onload = function() {
     var words = []
     var definitions =[]
         // 加载外部 JSON 文件
-        const jsonUrl = chrome.runtime.getURL('data/vocabulary.json');
+        const jsonUrl = chrome.runtime.getURL('data/kaoyan.json');
         fetch(jsonUrl)
         .then(response => response.json())
         .then(data => {

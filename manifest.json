@@ -10,7 +10,11 @@
   }],
   "web_accessible_resources": [
     {
-      "resources": ["data/vocabulary.json"],
+      "resources": [
+        "data/vocabulary.json",
+        "data/cet4.json",
+        "data/kaoyan.json"
+      ],
       "matches": ["<all_urls>"]
     }
   ]
