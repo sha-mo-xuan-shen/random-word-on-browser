@@ -2,8 +2,16 @@
   "manifest_version": 3,
   "name": "单词提示",
   "version": "1.0",
+  "permissions": [],
+  "host_permissions": ["<all_urls>"],
   "content_scripts": [{
     "matches": ["<all_urls>"],
     "js": ["cet4.js"]
-  }]
+  }],
+  "web_accessible_resources": [
+    {
+      "resources": ["data/vocabulary.json"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }
