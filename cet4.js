@@ -5,7 +5,7 @@ onload = function() {
     var words = []
     var definitions =[]
         // 加载外部 JSON 文件
-        const jsonUrl = chrome.runtime.getURL('data/kaoyan.json');
+        const jsonUrl = chrome.runtime.getURL('data/kaoyan.json');//在这里修改要更换的单词表
         fetch(jsonUrl)
         .then(response => response.json())
         .then(data => {
